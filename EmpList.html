@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Employee List</title>
+<link rel="icon" href="empIcon.png">
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  
+<script>
+
+var app = angular.module('employeeApp', []);
+//function emptableCtrl($scope)
+app.controller('emptableCtrl', function($scope,$http) {
+ $scope.getID = (function () {
+    var counter = 0;
+    return function () {return counter += 1;}
+})();
+ $scope.employeeTable = [{"name" : "John Smith", "tech" : "C/C++/Java","address" : "555 E El Camino Real", "id" : $scope.getID()}]; 
+ $scope.addEmp = function(){
+ //alert("In Submit");
+ 
+ if($scope.empName){
+  $("#newButton").css("background-color", "#4CAF50");
+   $("#newButton").prop("value", "Add New Employee");
+    $("#nameInput").css("border", "");
+ $scope.employeeTable.push({"name" : $scope.empName, "tech" : $scope.empTech, "address" : $scope.empAddress, "id" : $scope.getID()});
+ $scope.empName="";
+ $scope.empTech="";
+ $scope.empAddress="";
+ }else{
+  $("#newButton").css("background-color", "#cc0000");
+    $("#newButton").prop("value", "Name Required!");
+	 $("#nameInput").css("border", "1px solid red");
+ }
+ }
+ 
+ $scope.editEmp = function(id){
+ //alert("ID: " + id);
+ angular.forEach($scope.employeeTable, function(x){
+ if(id===x.id){
+    //editEmpfinal(x);
+	$scope.editName  = x.name;
+	$scope.editTech = x.tech;
+	$scope.editAddress = x.address;
+	$scope.editid = x.id;
+	$scope.displayEditName = x.name;
+ }
+ 
+ });
+ }
+ 
+ $scope.editEmpfinal = function(){
+ //alert("x: " + $scope.editid ); 
+ angular.forEach($scope.employeeTable, function(x){
+ if($scope.editid===x.id){
+    //editEmpfinal(x);
+	if($scope.editName){
+	$("#editButton").css("background-color", "#4CAF50");
+ 
+    $("#editInput").css("border", "");
+  x.name = 	$scope.editName;
+	 x.tech = $scope.editTech;
+	x.address = $scope.editAddress ;
+	$scope.editid = "";
+	
+	
+	$scope.editName = "";
+	$scope.editTech ="";
+	$scope.editAddress = "";
+	$scope.displayEditName="";
+	}
+ }
+ 
+ });
+ $scope.editName = "";
+	$scope.editTech ="";
+	$scope.editAddress = "";
+	$scope.displayEditName="";
+ 
+ }
+ 
+ $scope.removeEmp = function(id){
+ 
+ //alert("id: " + id);
+ var oldList = $scope.employeeTable;
+ $scope.employeeTable = [];
+ angular.forEach(oldList, function(x){
+  //alert("In for loop");
+ //alert("x.id: " + x.id);
+ if(x.id != id){
+ $scope.employeeTable.push(x);
+ }
+});
+ }
+ 
+ 
+							
+	
+
+});
+
+
+
+</script>
+
+<style>
+input[type=text] {
+    width: 25%;
+    padding: 12px 20px;
+    margin: 8px 0px 5px 0px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+	
+}
+input:focus{
+	
+	border: 2px solid #4CAF50;
+	
+	
+}
+
+input[type=submit] {
+    width: 33%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit] :hover {
+    background-color: #45a049;
+}
+
+button{
+ width: 25%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+}
+.maintable th,td{
+
+text-align : center;
+
+}
+#newTable, #editTable{
+
+width : 100%;
+}
+
+#newTable td, #editTable td{
+text-align : left;
+}
+#newTable, #editTable{
+
+margin: 15px 10px 10px 5px;
+}
+
+
+
+
+
+
+
+
+
+</style>
+</head>
+<body>
+<div ng-app="employeeApp" class="container-fluid">
+
+ <div ng-controller="emptableCtrl">
+ 
+ <h2>Employee List</h2>
+ <p><input ng-model="searchText">  <span class="glyphicon glyphicon-search"></span>	Filter Results</p>
+ <table class="table table-striped maintable">
+ <tr>
+ <th>Name</th>
+ <th>Technologies</th>
+ <th>Address</th>
+ <th>Modify</th>
+
+ </tr>
+ <tr ng-repeat="emp in employeeTable | filter:searchText">
+ <td>{{emp.name}}</td>
+ <td>{{emp.tech}}</td>
+ <td>{{emp.address}}</td>
+  <td ><button type="button" ng-click="editEmp(emp.id)" class="btn btn-info"><span class="glyphicon glyphicon-cog"> Edit</span></button> <button type="button" ng-click="removeEmp(emp.id)" class="btn btn-danger"> <span class="glyphicon glyphicon-trash"> Remove</span></button></td>
+ 
+ </tr>
+ </table>
+ <h2>Add New Employee:</h2>
+ <form ng-submit="addEmp()">
+ <table id="newTable" >
+ 
+ <tr  >
+ <td style="width:10%">Name:</td>
+ <td>
+ <input type="text" id="nameInput" ng-model = "empName" placeholder="Name">
+ </td>
+ </tr>
+ <tr>
+ <td>Technologies:</td>
+ <td>
+ <input type="text" ng-model = "empTech" placeholder="Technologies">
+ </td>
+ </tr>
+ <tr>
+ <td>Address:</td>
+ <td>
+ <input type="text" ng-model = "empAddress" placeholder="Address">
+ </td>
+ </tr>
+ </table>
+ <input type="submit" id="newButton"value="Add New Employee">
+ 
+ 
+ 
+ </form>
+ <h2>Edit {{displayEditName}}:</h2>
+ <form ng-submit="editEmpfinal()">
+ <table id = "editTable">
+ <tr>
+ <td  style="width:10%">New Name:</td>
+ <td>
+ <input type="text" id="editInput"ng-model = "editName" placeholder="Name">
+ </td>
+ </tr>
+ <tr>
+ <td>New Technologies:</td>
+ <td>
+ 
+ <input type="text" ng-model = "editTech" placeholder="Technologies">
+</td>
+</tr>
+<tr>
+<td>New Address:</td>
+<td> 
+ <input type="text" ng-model = "editAddress" placeholder="Address">
+ </td>
+ </tr>
+ </table>
+ <input type="submit" id="editButton" value="Update {{displayEditName}}">
+ 
+ 
+ 
+ </form>
+ 
+ </div>
+</div>
+
+
+
+</body>
+</html>
